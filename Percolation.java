@@ -21,11 +21,11 @@ public class Percolation {
             uf.union(i, n);
         }
 
-        // connect the virtual sites at the bottom
-        int bottomLeft = n * (n - 1);
+        /* connect the virtual sites at the bottom
+        int bottomLeft = rowColToIndex(n - 1, 0);
         for (int i = 0; i < n; i++) {
             uf.union(bottomLeft + i, n * n - 1);
-        }
+        }*/
     }
 
     private void validateCell(int row, int col) {
@@ -48,16 +48,18 @@ public class Percolation {
         // Check top, right, bottom left
         // make sure each is open
         // if a side is open, then union the this spot with that
-        if (isOnGrid(row - 1, col)) { // top
+
+
+        if (isOnGrid(row - 1, col) && isOpen(row - 1, col)) { // top
             uf.union(rowColToIndex(row, col), rowColToIndex(row - 1, col));
         }
-        if (isOnGrid(row, col + 1)) { // right
+        if (isOnGrid(row, col + 1) && isOpen(row, col + 1)) { // right
             uf.union(rowColToIndex(row, col), rowColToIndex(row, col + 1));
         }
-        if (isOnGrid(row + 1, col)) { // bottom
+        if (isOnGrid(row + 1, col) && isOpen(row + 1, col)) { // bottom
             uf.union(rowColToIndex(row, col), rowColToIndex(row + 1, col));
         }
-        if (isOnGrid(row, col - 1)) { // left
+        if (isOnGrid(row, col - 1)&& isOpen(row, col - 1)) { // left
             uf.union(rowColToIndex(row, col), rowColToIndex(row, col - 1));
         }
 
