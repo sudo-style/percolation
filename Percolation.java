@@ -93,43 +93,42 @@ public class Percolation {
         return col + row * n;
     }
 
-    // outputs to the console a model of the system
-    private void viewOpen() {
-        for (int row = 0; row < n; row++) {
-            for (int col = 0; col < n; col++) {
-                if (isFull(row, col)) {
-                    StdOut.print("P,");
-                }
-                else if (isOpen(row,col)) {
-                    StdOut.print("#,");
-                }
-                else {
-                    StdOut.print(".,");
-                }
+// outputs to the console a model of the system
+private void viewOpen() {
+    for (int row = 0; row < n; row++) {
+        for (int col = 0; col < n; col++) {
+            if (!isOpen(row, col)) {
+                StdOut.print(". ");
             }
-            StdOut.print("\n");
+            else if (isFull(row, col)) {
+                StdOut.print("P ");
+            }
+            else if (isOpen(row,col)) {
+                StdOut.print("# ");
+            }else{
+                StdOut.print("X ");
+            }
         }
-        StdOut.println("\n");
+        StdOut.print("\n");
     }
+    StdOut.println("\n");
+}
 
-    // test client (optional)
-    public static void main(String[] args) {
-        StdOut.print("Grid Size: ");
-        int n = StdIn.readInt();
-        Percolation p = new Percolation(n);
-        boolean keepGoing = true;
-        while (keepGoing) {
-            int r = StdIn.readInt();
-            int c = StdIn.readInt();
-            if (p.isOpen(r, c)) {
-                keepGoing = false;
-            }
-            p.open(r, c);
-            p.viewOpen();
-            if (p.percolates()) {
-                keepGoing = false;
-            }
+// test client (optional)
+public static void main(String[] args) {
+    StdOut.print("Grid Size: ");
+    int n = StdIn.readInt();
+    Percolation p = new Percolation(n);
+    boolean keepGoing = true;
+    while (keepGoing) {
+        //randomly chose between 0 to n-1
+        int row = (int) (Math.random() * n);
+        int col = (int) (Math.random() * n);
+        p.open(row, col);
+        p.viewOpen();
+        if (p.percolates()) {
+            keepGoing = false;
         }
     }
 }
-
+}
