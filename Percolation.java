@@ -85,7 +85,7 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        return uf.find(0) == uf.find(n * n - 1);
+        return uf.find(n*n) == uf.find(n * n + 1);
     }
 
     // converts the 2d row/col to a 1d index
