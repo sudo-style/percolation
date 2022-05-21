@@ -35,9 +35,7 @@ public class Percolation {
     }
 
     private boolean isOnGrid(int row, int col) {
-        int shiftRow = row - 1;
-        int shiftCol = col - 1;
-        return (shiftRow >= 0 && shiftCol >= 0 && shiftRow < n && shiftCol < n);
+        return row >= 0 && row < n && col >= 0 && col < n;
     }
 
     // opens the site (row, col) if it is not open already
@@ -74,7 +72,7 @@ public class Percolation {
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
         validateCell(row, col);
-        if (!isOpen(row, col)) return false;
+        if (!isOpen(row,col)) return false;
         return uf.find(rowColToIndex(row, col)) == uf.find(0);
     }
 
@@ -97,10 +95,10 @@ public class Percolation {
     private void viewOpen() {
         for (int row = 0; row < n; row++) {
             for (int col = 0; col < n; col++) {
-                if (isOpen(row, col)) {
+                if (isFull(row, col)) {
                     StdOut.print("P,");
                 }
-                else if (true) {
+                else if (isOpen(row,col)) {
                     StdOut.print("#,");
                 }
                 else {
@@ -119,7 +117,6 @@ public class Percolation {
         Percolation p = new Percolation(n);
         boolean keepGoing = true;
         while (keepGoing) {
-            StdOut.print("Row, Col: ");
             int r = StdIn.readInt();
             int c = StdIn.readInt();
             if (p.isOpen(r, c)) {
@@ -127,9 +124,9 @@ public class Percolation {
             }
             p.open(r, c);
             p.viewOpen();
-            StdOut.println("Number open: " + p.numberOfOpenSites());
-            StdOut.println("Percolates: " + p.percolates());
-            StdOut.println("Count: " + p.uf.count());
+            if (p.percolates()) {
+                keepGoing = false;
+            }
         }
     }
 }
