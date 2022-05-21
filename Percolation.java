@@ -13,19 +13,19 @@ public class Percolation {
         if (n <= 0) throw new IllegalArgumentException();
         this.n = n;
         this.open = new boolean[n * n];
-        this.uf = new WeightedQuickUnionUF(n * n);
+        this.uf = new WeightedQuickUnionUF(n * n+2); // +2 for virtual top and bottom
         this.numberOfOpenSites = 0;
 
         // connect the virtual sites at the top
         for (int i = 0; i < n; i++) {
-            uf.union(i, n);
+            uf.union(i, n*n);
         }
 
-        /* connect the virtual sites at the bottom
+        // connect the virtual sites at the bottom
         int bottomLeft = rowColToIndex(n - 1, 0);
         for (int i = 0; i < n; i++) {
-            uf.union(bottomLeft + i, n * n - 1);
-        }*/
+            uf.union(bottomLeft + i, n * n + 1);
+        }
     }
 
     private void validateCell(int row, int col) {
