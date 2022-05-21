@@ -49,8 +49,6 @@ public class Percolation {
         // Check top, right, bottom left
         // make sure each is open
         // if a side is open, then union the this spot with that
-
-
         if (isOnGrid(row - 1, col) && isOpen(row - 1, col)) { // top
             uf.union(rowColToIndex(row, col), rowColToIndex(row - 1, col));
         }
@@ -63,7 +61,6 @@ public class Percolation {
         if (isOnGrid(row, col - 1) && isOpen(row, col - 1)) { // left
             uf.union(rowColToIndex(row, col), rowColToIndex(row, col - 1));
         }
-
     }
 
     // is the site (row, col) open?
@@ -118,8 +115,7 @@ public class Percolation {
 
     // test client (optional)
     public static void main(String[] args) {
-        StdOut.print("Grid Size: ");
-        int n = StdIn.readInt();
+        int n = 20;
         Percolation p = new Percolation(n);
         boolean keepGoing = true;
         while (keepGoing) {
