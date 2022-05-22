@@ -55,9 +55,9 @@ public class PercolationStats {
 
     // test client (see below)
     public static void main(String[] args) {
-        //int n = StdIn.readInt();
-        //int trials = StdIn.readInt();
-        //time how long it takes to run the code
+        // int n = StdIn.readInt();
+        // int trials = StdIn.readInt();
+        // time how long it takes to run the code
 
         int[] sizes = {100, 200, 300, 400, 500};
         int[] trials = {62,125,250,500,1000,2000};
@@ -71,7 +71,7 @@ public class PercolationStats {
             }
             StdOut.println("Done with n = " + sizes[i]);
         }
-        //print the times
+        // print the times
         for (int i = 0; i < sizes.length; i++) {
             for (int j = 0; j < trials.length; j++) {
                 StdOut.print(times[i][j] + " ");

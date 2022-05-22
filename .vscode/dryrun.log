@@ -1,6 +1,6 @@
-make --dry-run --always-make --keep-going --print-directory
+make stats --dry-run --always-make --keep-going --print-directory
 make: Entering directory `/Users/nickaloyd/Downloads/percolation'
-javac-algs4 Percolation.java
-java-algs4 Percolation
+javac-algs4 PercolationStats.java
+java-algs4 PercolationStats
 make: Leaving directory `/Users/nickaloyd/Downloads/percolation'
  

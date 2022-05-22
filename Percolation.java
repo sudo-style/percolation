@@ -71,9 +71,9 @@ public class Percolation {
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
+        //to be full it must be open and connected to the top
         validateCell(row, col);
-        if (!isOpen(row, col)) return false;
-        return uf.find(rowColToIndex(row, col)) == uf.find(0);
+        return isOpen(row, col) && uf.connected(rowColToIndex(row, col), n * n);
     }
 
     // returns the number of open sites
@@ -115,7 +115,7 @@ public class Percolation {
 
     // test client (optional)
     public static void main(String[] args) {
-        int n = 20;
+        int n = 10;
         Percolation p = new Percolation(n);
         boolean keepGoing = true;
         while (keepGoing) {
