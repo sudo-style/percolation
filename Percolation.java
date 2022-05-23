@@ -15,17 +15,19 @@ public class Percolation {
         this.n = n;
         this.open = new boolean[n * n];
         this.uf = new WeightedQuickUnionUF(n * n + 2); // +2 for virtual top and bottom
+        this.top = n * n;
+        this.bottom = n * n + 1;
         this.numberOfOpenSites = 0;
 
         // connect the virtual sites at the top
         for (int i = 0; i < n; i++) {
-            uf.union(i, n * n);
+            uf.union(i, top);
         }
 
         // connect the virtual sites at the bottom
         int bottomLeft = rowColToIndex(n - 1, 0);
         for (int i = 0; i < n; i++) {
-            uf.union(bottomLeft + i, n * n + 1);
+            uf.union(bottomLeft + i, bottom);
         }
     }
 
@@ -73,7 +75,7 @@ public class Percolation {
     public boolean isFull(int row, int col) {
         //to be full it must be open and connected to the top
         validateCell(row, col);
-        return isOpen(row, col) && uf.connected(rowColToIndex(row, col), n * n);
+        return isOpen(row, col) && uf.connected(rowColToIndex(row, col), top);
     }
 
     // returns the number of open sites
@@ -83,7 +85,7 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        return uf.find(n * n) == uf.find(n * n + 1);
+        return uf.find(top) == uf.find(bottom);
     }
 
     // converts the 2d row/col to a 1d index

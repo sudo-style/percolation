@@ -1,8 +1,6 @@
-import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
-import edu.princeton.cs.algs4.Stopwatch;
 
 public class PercolationStats {
     private static final double CONFIDENCE_LEVEL = 1.96;
@@ -21,11 +19,11 @@ public class PercolationStats {
             Percolation p = new Percolation(n);
             // randomly chose a row, col
             while (!p.percolates()) {
-                int r = StdRandom.uniform(n);
-                int c = StdRandom.uniform(n);
-                while (p.isOpen(r, c)) {
-                    r = StdRandom.uniform(n);
-                    c = StdRandom.uniform(n);
+                int row = StdRandom.uniform(n);
+                int col = StdRandom.uniform(n);
+                while (p.isOpen(row, col)) {
+                    row = StdRandom.uniform(n);
+                    col = StdRandom.uniform(n);
                 }
                 p.open(r, c);
             }
@@ -55,40 +53,12 @@ public class PercolationStats {
 
     // test client (see below)
     public static void main(String[] args) {
-        // int n = StdIn.readInt();
-        // int trials = StdIn.readInt();
-        // time how long it takes to run the code
-
-        int[] sizes = {100, 200, 300, 400, 500};
-        int[] trials = {62,125,250,500,1000,2000};
-
-        double[][] times = new double[sizes.length][trials.length];
-        for (int i = 0; i < sizes.length; i++) {
-            for (int j = 0; j < trials.length; j++) {
-                Stopwatch timer = new Stopwatch();
-                PercolationStats ps = new PercolationStats(sizes[i], trials[j]);
-                times[i][j] = timer.elapsedTime();
-            }
-            StdOut.println("Done with n = " + sizes[i]);
-        }
-        // print the times
-        for (int i = 0; i < sizes.length; i++) {
-            for (int j = 0; j < trials.length; j++) {
-                StdOut.print(times[i][j] + " ");
-            }
-            StdOut.println();
-        }
- 
-        Stopwatch timer = new Stopwatch();
-        int n = StdIn.readInt();
-        int trial = StdIn.readInt();
-        PercolationStats stats = new PercolationStats(n, trial);
-        double time = timer.elapsedTime();
+        int n = Integer.parseInt(args[0]);
+        int trials = Integer.parseInt(args[1]);
+        PercolationStats stats = new PercolationStats(n, trials);
         StdOut.printf("%-24s = %3.6f%n", "mean", stats.mean());
         StdOut.printf("%-24s = %3.18f%n", "stddev", stats.stddev());
         StdOut.printf("%-24s = [%17s, %3.16f]", "95% confidence interval",
-                        stats.confidenceLo(), stats.confidenceHi());
-        StdOut.println("\n" + time+ " n: "+n + " trials: "+stats.trials);
-        StdOut.println("estimated time completion = ((3n*n)-(300*n)+(20*trials))/60000");
+                      stats.confidenceLo(), stats.confidenceHi());
     }
 }
