@@ -25,7 +25,7 @@ public class PercolationStats {
                     row = StdRandom.uniform(n);
                     col = StdRandom.uniform(n);
                 }
-                p.open(r, c);
+                p.open(row, col);
             }
             sample[i] = (double) p.numberOfOpenSites() / (double) (n * n);
         }
