@@ -51,8 +51,6 @@ public class PercolationStats {
     public static void main(String[] args) {
         int n = Integer.parseInt(args[0]);
         int trials = Integer.parseInt(args[1]);
-        // int n = StdIn.readInt();
-        // int trials = StdIn.readInt();
         PercolationStats stats = new PercolationStats(n, trials);
         StdOut.printf("%-24s = %3.6f%n", "mean", stats.mean());
         StdOut.printf("%-24s = %3.18f%n", "stddev", stats.stddev());

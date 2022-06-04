@@ -2,7 +2,7 @@ import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
-public class Percolation {
+public class PercolationNew {
     private final int n;
     private boolean[] open;
     private final WeightedQuickUnionUF uf;
@@ -11,61 +11,73 @@ public class Percolation {
     private final int bottom;
 
     // creates n-by-n grid, with all sites initially blocked
-    public Percolation(int n) {
+    public PercolationNew(int n) {
         this.n = n;
         this.top = n * n;
         this.bottom = n * n + 1;
         this.open = new boolean[n * n + 2];
         this.uf = new WeightedQuickUnionUF(n * n + 2);
         this.numberOfOpenSites = 0;
+
+        // connect the virtual sites at the top
+        for (int i = 0; i < n; i++) {
+            uf.union(i, top);
+        }
+        // connect the virtual sites at the bottom
+        int bottomLeft = n * n - n;
+        for (int i = bottomLeft; i < top; i++) {
+            uf.union(i, bottom);
+        }
     }
 
     // opens the site (row, col) if it is not open already
     public void open(int row, int col) {
-        checkRange(row, col);
-        if (isOpen(row, col)) return;
-        int cell = flattenGrid(row, col);
-        open[cell] = true;
-        numberOfOpenSites++;
+        if (isOpen(row, col)) {
+            return;
+        }
+        if (row > n || col > n || row < 1 || col < 1) {
+            throw new IndexOutOfBoundsException("row or column fuck you out of bounds");
+        }
+        open[flattenGrid(row, col)] = true;
+        numberOfOpenSites += 1;
 
+        int[] topDownLeftRight = {
+                flattenGrid(row + 1, col),  // bottom
+                flattenGrid(row - 1, col),  // top
+                flattenGrid(row, col + 1),  // right
+                flattenGrid(row, col - 1),  // left
+        };
 
-        // top
-        if (row == 1) {
-            union(cell, top);
+        for (int i = 0; i < topDownLeftRight.length; i++) {
+            if (isValid(topDownLeftRight[i])) {
+                if (open[topDownLeftRight[i]]) {
+                    uf.union((row - 1) * n + (col - 1), topDownLeftRight[i]);
+                }
+            }
         }
-        else if (isOpen(row - 1, col)) {
-            union(flattenGrid(row - 1, col), cell);
-        }
+    }
 
-        // right
-        if (col != n && isOpen(row, col + 1)) {
-            union(flattenGrid(row, col + 1), cell);
-        }
+    private boolean isValid(int index) {
+        return index > 0 && index < n * n;
+    }
 
-        // bottom
-        if (row == n) {
-            union(cell, bottom);
-        }
-        else if (isOpen(row + 1, col)) {
-            union(flattenGrid(row + 1, col), cell);
-        }
-
-        // left
-        if (col != 1 && isOpen(row, col - 1)) {
-            union(flattenGrid(row, col - 1), cell);
-        }
+    // this will convert the row and column to a flattened index
+    private int flattenGrid(int row, int col) {
+        return (row - 1) * n + (col - 1);
     }
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col) {
-        checkRange(row, col);
-        return open[flattenGrid(row, col)];
+        if (row > n || col > n || row < 1 || col < 1) {
+            return false;
+        } // checks if the site is valid
+        return open[(row - 1) * n + col - 1];
     }
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
-        checkRange(row, col);
-        return connected(top, flattenGrid(row, col));
+        // is it open and connected to the top?
+        return isOpen(row, col) && uf.find((row - 1) * n + col - 1) == uf.find(top);
     }
 
     // returns the number of open sites
@@ -75,29 +87,12 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        return connected(top, bottom);
+        return uf.connected(top,bottom);
     }
 
-    public boolean isConnectedToBottom(int row, int col) {
-        checkRange(row, col);
-        return connected(bottom, flattenGrid(row, col));
-    }
-
-    private void union(int a, int b) {
-        uf.union(a, b);
-    }
-
-    // uf connected is deprecated
-    private boolean connected(int a, int b) {
-        return uf.find(a) == uf.find(b);
-    }
-
-    private void checkRange(int row, int col) {
-        if (row <= 0 || col <= 0 || row > n || col > n) throw new IndexOutOfBoundsException();
-    }
-
-    private int flattenGrid(int row, int column) {
-        return (n * (row - 1)) + column - 1;
+    private boolean isConnectedToBottom(int row, int col) {
+        return isOpen(row, col) && uf.find((row - 1) * n + col - 1) == uf
+                .find(bottom);
     }
 
     // outputs to the console a model of the system
@@ -132,7 +127,7 @@ public class Percolation {
 
     // test client (optional)
     public static void main(String[] args) {
-        Percolation perc = new Percolation(10);
+        PercolationNew perc = new PercolationNew(10);
         while (!perc.percolates()) {
             System.out.println();
             int row = StdRandom.uniform(perc.n) + 1;
@@ -142,7 +137,6 @@ public class Percolation {
             perc.view();
         }
         System.out.println(perc.numberOfOpenSites());
-
 
     }
 }
