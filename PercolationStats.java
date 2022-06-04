@@ -19,12 +19,8 @@ public class PercolationStats {
             Percolation p = new Percolation(n);
             // randomly chose a row, col
             while (!p.percolates()) {
-                int row = StdRandom.uniform(n);
-                int col = StdRandom.uniform(n);
-                while (p.isOpen(row, col)) {
-                    row = StdRandom.uniform(n);
-                    col = StdRandom.uniform(n);
-                }
+                int row = StdRandom.uniform(n) + 1;
+                int col = StdRandom.uniform(n) + 1;
                 p.open(row, col);
             }
             sample[i] = (double) p.numberOfOpenSites() / (double) (n * n);
@@ -55,6 +51,8 @@ public class PercolationStats {
     public static void main(String[] args) {
         int n = Integer.parseInt(args[0]);
         int trials = Integer.parseInt(args[1]);
+        // int n = StdIn.readInt();
+        // int trials = StdIn.readInt();
         PercolationStats stats = new PercolationStats(n, trials);
         StdOut.printf("%-24s = %3.6f%n", "mean", stats.mean());
         StdOut.printf("%-24s = %3.18f%n", "stddev", stats.stddev());

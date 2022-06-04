@@ -7,6 +7,7 @@ public class Percolation {
     private boolean[] open;
     private final WeightedQuickUnionUF ufTopToBottom;
     private final WeightedQuickUnionUF ufBottomToTop;
+    // private final WeightedQuickUnionUF uf; // this will be used to see if the system percolates
     private int numberOfOpenSites;
     private final int top;
     private final int bottom;
@@ -19,6 +20,7 @@ public class Percolation {
         this.open = new boolean[n * n];
         this.ufTopToBottom = new WeightedQuickUnionUF(n * n + 2);
         this.ufBottomToTop = new WeightedQuickUnionUF(n * n + 2);
+        // this.uf = new WeightedQuickUnionUF(n * n + 2);
         this.numberOfOpenSites = 0;
 
         // connect the virtual sites at the top
@@ -34,37 +36,53 @@ public class Percolation {
 
     // opens the site (row, col) if it is not open already
     public void open(int row, int col) {
-        if (!isOpen(row, col)) {
-            numberOfOpenSites += 1;
+        if (isOpen(row, col)) {
+            return;
+        }
+        if (row > n || col > n || row < 1 || col < 1) {
+            throw new IndexOutOfBoundsException("row or column fuck you out of bounds");
         }
         open[flattenGrid(row, col)] = true;
-        if (isOnGrid(row - 1, col) && isOpen(row - 1, col)) { // top
-            ufTopToBottom.union(flattenGrid(row, col), flattenGrid(row - 1, col));
-            ufBottomToTop.union(flattenGrid(row, col), flattenGrid(row - 1, col));
+        numberOfOpenSites += 1;
+
+        int[] topDownLeftRight = {
+                flattenGrid(row + 1, col),  // bottom
+                flattenGrid(row - 1, col),  // top
+                flattenGrid(row, col + 1),  // right
+                flattenGrid(row, col - 1),  // left
+        };
+
+        for (int i = 0; i < topDownLeftRight.length; i++) {
+            if (isValid(topDownLeftRight[i])) {
+                if (open[topDownLeftRight[i]]) {
+                    ufTopToBottom.union((row - 1) * n + (col - 1), topDownLeftRight[i]);
+                    ufBottomToTop.union((row - 1) * n + (col - 1), topDownLeftRight[i]);
+                }
+            }
         }
-        if (isOnGrid(row, col + 1) && isOpen(row, col + 1)) { // right
-            ufTopToBottom.union(flattenGrid(row, col), flattenGrid(row, col + 1));
-            ufBottomToTop.union(flattenGrid(row, col), flattenGrid(row, col + 1));
-        }
-        if (isOnGrid(row + 1, col) && isOpen(row + 1, col)) { // bottom
-            ufTopToBottom.union(flattenGrid(row, col), flattenGrid(row + 1, col));
-            ufBottomToTop.union(flattenGrid(row, col), flattenGrid(row + 1, col));
-        }
-        if (isOnGrid(row, col - 1) && isOpen(row, col - 1)) { // left
-            ufTopToBottom.union(flattenGrid(row, col), flattenGrid(row, col - 1));
-            ufBottomToTop.union(flattenGrid(row, col), flattenGrid(row, col - 1));
-        }
+    }
+
+    private boolean isValid(int index) {
+        return index > 0 && index < n * n;
+    }
+
+    // this will convert the row and column to a flattened index
+    private int flattenGrid(int row, int col) {
+        return (row - 1) * n + (col - 1);
     }
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col) {
-        return open[flattenGrid(row, col)];
+        if (row > n || col > n || row < 1 || col < 1) {
+            return false;
+        } // checks if the site is valid
+        return open[(row - 1) * n + col - 1];
     }
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
         // is it open and connected to the top?
-        return isOpen(row, col) && ufTopToBottom.find(flattenGrid(row, col)) == ufTopToBottom
+        return isOpen(row, col) && ufTopToBottom.find((row - 1) * n + col - 1) == ufTopToBottom
                 .find(top);
     }
 
@@ -75,7 +93,6 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        // is any site on the bottom connected to the top
         for (int i = 0; i < n; i++) {
             if (ufTopToBottom.find(n * n - n + i) == ufTopToBottom.find(top)) {
                 return true;
@@ -84,23 +101,15 @@ public class Percolation {
         return false;
     }
 
-    private int flattenGrid(int row, int col) {
-        return row * n + col;
-    }
-
-    private boolean isOnGrid(int row, int col) {
-        return row >= 0 && row < n && col >= 0 && col < n;
-    }
-
     private boolean isConnectedToBottom(int row, int col) {
-        return isOpen(row, col) && ufBottomToTop.find(flattenGrid(row, col)) == ufBottomToTop
+        return isOpen(row, col) && ufBottomToTop.find((row - 1) * n + col - 1) == ufBottomToTop
                 .find(bottom);
     }
 
     // outputs to the console a model of the system
-    private void viewOpen() {
-        for (int row = 0; row < n; row++) {
-            for (int col = 0; col < n; col++) {
+    private void view() {
+        for (int row = 1; row <= n; row++) {
+            for (int col = 1; col <= n; col++) {
                 // if the cell is empty
                 if (!open[flattenGrid(row, col)]) {
                     StdOut.print(". ");
@@ -116,7 +125,7 @@ public class Percolation {
                 else if (isOpen(row, col)) {
                     StdOut.print("O ");
                 }
-                
+
                 // the cell percolates if it is connected to the top and bottom
                 else {
                     StdOut.print("P ");
@@ -129,43 +138,16 @@ public class Percolation {
 
     // test client (optional)
     public static void main(String[] args) {
-        int n = 10;
-        Percolation p = new Percolation(n);
-        while (!p.percolates()) {
-            // randomly chose between 0 to n-1
-            int row = StdRandom.uniform(n);
-            int col = StdRandom.uniform(n);
-            if (!p.isOpen(row, col)) {
-                p.open(row, col);
-                p.viewOpen();
-            }
-        }
-        System.out.println(p.numberOfOpenSites());
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (p.isFull(i, j)) {
-                    System.out.print("T ");
-                }
-                else {
-                    System.out.print(". ");
-                }
-            }
+        Percolation perc = new Percolation(10);
+        while (!perc.percolates()) {
             System.out.println();
+            int row = StdRandom.uniform(perc.n) + 1;
+            int col = StdRandom.uniform(perc.n) + 1;
+            System.out.println("Open: " + row + ", " + col);
+            perc.open(row, col);
+            perc.view();
         }
+        System.out.println(perc.numberOfOpenSites());
 
-        System.out.println(" ");
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (p.isConnectedToBottom(i, j)) {
-                    System.out.print("B ");
-                }
-                else {
-                    System.out.print(". ");
-                }
-            }
-            System.out.println();
-        }
     }
 }

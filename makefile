@@ -5,6 +5,6 @@ stats:
 	javac-algs4 PercolationStats.java
 	java-algs4 PercolationStats
 
-run2: 
-	javac-algs4 Percolation2.java
-	java-algs4 Percolation2
+new:	
+	javac-algs4 PercolationNew.java
+	java-algs4 PercolationNew
