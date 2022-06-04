@@ -65,7 +65,7 @@ public class Percolation {
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
         checkRange(row, col);
-        return connected(top, flattenGrid(row, col));
+        return uf.find(top) == uf.find(flattenGrid(row, col));
     }
 
     // returns the number of open sites
@@ -75,21 +75,16 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        return connected(top, bottom);
+        return uf.find(top) == uf.find(bottom);
     }
 
-    public boolean isConnectedToBottom(int row, int col) {
+    private boolean isConnectedToBottom(int row, int col) {
         checkRange(row, col);
-        return connected(bottom, flattenGrid(row, col));
+        return uf.find(bottom) == uf.find(flattenGrid(row, col));
     }
 
     private void union(int a, int b) {
         uf.union(a, b);
-    }
-
-    // uf connected is deprecated
-    private boolean connected(int a, int b) {
-        return uf.find(a) == uf.find(b);
     }
 
     private void checkRange(int row, int col) {
